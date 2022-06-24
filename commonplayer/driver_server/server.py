@@ -26,11 +26,13 @@ class BrowserServer:
     def run(self):
         """Run the main loop."""
         conn, address = self.socket.accept()
+        logging.debug(f'{address} connected')
         while True:
             data = conn.recv(1024).decode()
     
             if not data:
                 conn, address = self.socket.accept()
+                logging.debug(f'{address} connected')
                 continue
     
             parsed = json.loads(data)
@@ -40,23 +42,23 @@ class BrowserServer:
     
             if command == self.START:
                 self.init_driver()
+                self.send(conn)
                 
             elif command == self.EXIT:
                 self.close_driver()
+                self.send(conn)
                 break
                 
             elif command == self.GET:
                 url = self.current_url
-                data = {
-                    'url': url,
-                    'ok': True
-                }
+                data = dict(url=url, ok=True)
                 if url is None:
                     data['ok'] = False
-                conn.send(json.dumps(data).encode())
+                self.send(conn, data)
     
             elif command == self.GOTO:
                 self.go_to_url(value)
+                self.send(conn)
 
         conn.close()
 
@@ -74,6 +76,21 @@ class BrowserServer:
         if self.driver is not None:
             self.driver.quit()
             self.driver = None
+            
+    def send(self, conn, data=None):
+        """Send data to socket.
+        
+        Parameters
+        ----------
+        conn : socket.socket
+        data : dict
+            Data to be sent. If set to None (default) {'ok':True} is
+            sent.
+        """
+        
+        if data is None:
+            data = dict(ok=True)
+        conn.send(json.dumps(data).encode())
             
     def go_to_url(self, url):
         """Go to a given url.

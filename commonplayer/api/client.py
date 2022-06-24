@@ -1,4 +1,5 @@
 import socket
+import json
 
 
 class BrowserClient:
@@ -18,15 +19,25 @@ class BrowserClient:
         """Connect to a server."""
         self.socket.connect((self.host, self.port))
         
-    def send(self, value):
+    def send(self, value, receive=True):
         """Send data to the connected server.
         
         Parameters
         ----------
-        value : str
+        value : dict
             Data to be sent to the server.
+        receive : bool
+            Whether to expect a response.
+        Returns
+        -------
+        dict
+            The received response. None if `receive` is False.
         """
-        self.socket.send(value.encode())
+        data = json.dumps(value)
+        self.socket.send(data.encode())
+        if receive:
+            return self.response()
+        return None
         
     def close(self):
         """Close the server connection."""
@@ -37,8 +48,8 @@ class BrowserClient:
         
         Returns
         -------
-        str
+        dict
             The received data.
         """
         data = self.socket.recv(1024).decode()
-        return data
+        return json.loads(data)
