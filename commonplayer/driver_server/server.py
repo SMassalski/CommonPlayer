@@ -1,9 +1,12 @@
 import socket
 import json
 import logging
+from urllib.parse import urlparse
 
 from selenium.webdriver.firefox.service import Service
 from selenium import webdriver
+
+from controllers.youtube import YoutubeController
 
 
 class BrowserServer:
@@ -12,6 +15,12 @@ class BrowserServer:
     EXIT = 'exit'  # Close the webdriver
     GOTO = 'go_to'  # Go to a given url
     GET = 'get_url'  # Return the current url
+    CONTROL = 'control'
+    
+    domain_controllers = {
+        'www.youtube.com': YoutubeController,
+        'youtu.be': YoutubeController
+    }
     
     def __init__(self, port=7777):
         
@@ -22,6 +31,7 @@ class BrowserServer:
         self.socket.listen(1)
         
         self.driver = None
+        self.controller = None
         
     def run(self):
         """Run the main loop."""
@@ -58,6 +68,10 @@ class BrowserServer:
     
             elif command == self.GOTO:
                 self.go_to_url(value)
+                self.send(conn)
+                
+            elif command == self.CONTROL:
+                self.control_player(value)
                 self.send(conn)
 
         conn.close()
@@ -101,6 +115,12 @@ class BrowserServer:
         """
         if self.driver is not None:
             self.driver.get(url)
+
+        controller_class = self.domain_controllers.get(urlparse(url).netloc)
+        if controller_class is None:
+            self.controller = None
+        elif not isinstance(self.controller, controller_class):
+            self.controller = controller_class(self.driver)
            
     @property
     def current_url(self):
@@ -113,6 +133,18 @@ class BrowserServer:
         if self.driver is not None:
             return self.driver.current_url
         return None
+    
+    def control_player(self, action):
+        """Perform a media controller action.
+        
+        Parameters
+        ----------
+        action : str
+
+        """
+        
+        if action in self.controller.actions:
+            self.controller.actions[action]()
         
   
 if __name__ == '__main__':

@@ -36,3 +36,33 @@ class NavigateSerializer(serializers.Serializer):
         pass
 
     url = serializers.CharField(max_length=128)
+
+
+class ControlSerializer(serializers.Serializer):
+    """Serializer for media controller commands
+
+    Fields:
+    - value: action to be performed by the controller.
+    """
+    
+    def update(self, instance, validated_data):
+        pass
+    
+    def create(self, validated_data):
+        pass
+
+    PLAY = 'play'
+    AUTOPLAY = 'autoplay'
+    FULLSCREEN = 'fullscreen'
+    SUBTITLES = 'subtitles'
+    HANDLE_COOKIE_POPUP = 'cookie'
+
+    ACTION_CHOICES = [
+        (PLAY, 'Play'),
+        (AUTOPLAY, 'Autoplay'),
+        (FULLSCREEN, 'Fullscreen'),
+        (SUBTITLES, 'Subtitles'),
+        (HANDLE_COOKIE_POPUP, 'Accept cookies')
+    ]
+    action = serializers.ChoiceField(choices=ACTION_CHOICES)
+    

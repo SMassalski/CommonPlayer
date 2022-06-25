@@ -9,6 +9,7 @@ class BrowserClient:
     EXIT = 'exit'
     GOTO = 'go_to'
     GET = 'get_url'
+    CONTROL = 'control'
     
     def __init__(self, port=7777):
         self.host = socket.gethostname()

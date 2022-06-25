@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .client import BrowserClient
-from .serializers import CommandSerializer, NavigateSerializer
+from .serializers import CommandSerializer, NavigateSerializer, \
+    ControlSerializer
 
 
 client = BrowserClient()
@@ -14,7 +15,7 @@ class NavigateView(APIView):
     """View for browser navigation"""
     serializer_class = NavigateSerializer
     
-    def get(self, request):
+    def get(self, _):
         """Get the current url of the browser"""
         data = {
             'command': BrowserClient.GET
@@ -35,7 +36,7 @@ class NavigateView(APIView):
         return Response(browser_response)
     
     
-class ControlView(APIView):
+class CommandView(APIView):
     """View for controlling the browser's lifecycle"""
     serializer_class = CommandSerializer
     
@@ -65,3 +66,18 @@ class ControlView(APIView):
                 return Response(browser_response,
                                 status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response(browser_response)
+        
+        
+class ControlView(APIView):
+    """View for issuing commands to the media controller"""
+    
+    serializer_class = ControlSerializer
+    
+    def post(self, request):
+        data = dict(command=BrowserClient.CONTROL)
+        data['value'] = request.data.get('action')
+        browser_response = client.send(data)
+        if not browser_response.get('ok'):
+            return Response(browser_response,
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(browser_response)
