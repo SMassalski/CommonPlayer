@@ -14,7 +14,8 @@ client.connect()
 class NavigateView(APIView):
     """View for browser navigation"""
     serializer_class = NavigateSerializer
-    
+
+    # noinspection PyMethodMayBeStatic
     def get(self, _):
         """Get the current url of the browser"""
         data = {
@@ -22,7 +23,8 @@ class NavigateView(APIView):
         }
         browser_response = client.send(data)
         return Response(browser_response)
-    
+
+    # noinspection PyMethodMayBeStatic
     def post(self, request):
         """Go to a given url"""
         data = {
@@ -39,7 +41,8 @@ class NavigateView(APIView):
 class CommandView(APIView):
     """View for controlling the browser's lifecycle"""
     serializer_class = CommandSerializer
-    
+
+    # noinspection PyMethodMayBeStatic
     def post(self, request):
         """Send a command to the server
         
@@ -73,6 +76,7 @@ class ControlView(APIView):
     
     serializer_class = ControlSerializer
     
+    # noinspection PyMethodMayBeStatic
     def post(self, request):
         data = dict(command=BrowserClient.CONTROL)
         data['value'] = request.data.get('action')
