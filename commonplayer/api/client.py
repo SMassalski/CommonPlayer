@@ -10,6 +10,13 @@ class BrowserClient:
     GOTO = 'go_to'
     GET = 'get_url'
     CONTROL = 'control'
+
+    # Media controller actions
+    PLAY = 'play'
+    AUTOPLAY = 'autoplay'
+    FULLSCREEN = 'fullscreen'
+    SUBTITLES = 'subtitles'
+    HANDLE_COOKIE_POPUP = 'cookie'
     
     def __init__(self, port=7777):
         self.host = socket.gethostname()

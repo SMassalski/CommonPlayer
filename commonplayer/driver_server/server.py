@@ -90,7 +90,8 @@ class BrowserServer:
         if self.driver is not None:
             self.driver.quit()
             self.driver = None
-            
+
+    # noinspection PyMethodMayBeStatic
     def send(self, conn, data=None):
         """Send data to socket.
         

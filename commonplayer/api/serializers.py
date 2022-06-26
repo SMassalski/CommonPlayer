@@ -51,18 +51,12 @@ class ControlSerializer(serializers.Serializer):
     def create(self, validated_data):
         pass
 
-    PLAY = 'play'
-    AUTOPLAY = 'autoplay'
-    FULLSCREEN = 'fullscreen'
-    SUBTITLES = 'subtitles'
-    HANDLE_COOKIE_POPUP = 'cookie'
-
     ACTION_CHOICES = [
-        (PLAY, 'Play'),
-        (AUTOPLAY, 'Autoplay'),
-        (FULLSCREEN, 'Fullscreen'),
-        (SUBTITLES, 'Subtitles'),
-        (HANDLE_COOKIE_POPUP, 'Accept cookies')
+        (BrowserClient.PLAY, 'Play'),
+        (BrowserClient.AUTOPLAY, 'Autoplay'),
+        (BrowserClient.FULLSCREEN, 'Fullscreen'),
+        (BrowserClient.SUBTITLES, 'Subtitles'),
+        (BrowserClient.HANDLE_COOKIE_POPUP, 'Accept cookies')
     ]
     action = serializers.ChoiceField(choices=ACTION_CHOICES)
     
