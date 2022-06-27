@@ -19,7 +19,6 @@ class YoutubeController(BaseController):
         super().__init__(driver)
         
         # Element definition
-        self.player = None
         self.play_button = None
         self.next_button = None
         self.autoplay_button = None
@@ -66,24 +65,23 @@ class YoutubeController(BaseController):
 
     # _=None because wait.until passes the driver as an argument
     def _fetch_components(self, _=None):
-        self.player = self.driver.find_element(By.ID, 'movie_player')
         
         # Play
-        self.play_button = self.player.find_element(By.CLASS_NAME,
+        self.play_button = self.driver.find_element(By.CLASS_NAME,
                                                     'ytp-play-button')
         # Next
-        self.next_button = self.player.find_element(By.CLASS_NAME,
+        self.next_button = self.driver.find_element(By.CLASS_NAME,
                                                     'ytp-next-button')
         # Subtitles
-        self.captions_button = self.player.find_element(By.CLASS_NAME,
+        self.captions_button = self.driver.find_element(By.CLASS_NAME,
                                                         'ytp-subtitles-button')
         # Autoplay
-        self.autoplay_button = self.player.find_element(
+        self.autoplay_button = self.driver.find_element(
             By.CLASS_NAME,
             'ytp-autonav-toggle-button')
         
         # Fullscreen
-        self.fullscreen_button = self.player.find_element(
+        self.fullscreen_button = self.driver.find_element(
             By.CLASS_NAME,
             'ytp-fullscreen-button')
         

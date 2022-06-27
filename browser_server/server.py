@@ -3,19 +3,21 @@ import json
 import logging
 from urllib.parse import urlparse
 
+# TODO: Browser selection / detection
 from selenium.webdriver.firefox.service import Service
 from selenium import webdriver
 
 from controllers.youtube import YoutubeController
 
 
+# TODO: Add adblock support
 class BrowserServer:
     
     START = 'start'  # Initiate the webdriver
     EXIT = 'exit'  # Close the webdriver
     GOTO = 'go_to'  # Go to a given url
     GET = 'get_url'  # Return the current url
-    CONTROL = 'control'
+    CONTROL = 'control'  # Send command to media controller
     
     domain_controllers = {
         'www.youtube.com': YoutubeController,
@@ -26,39 +28,41 @@ class BrowserServer:
         
         host = socket.gethostname()
 
-        self.socket = socket.socket()
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((host, port))
         self.socket.listen(1)
         
         self.driver = None
         self.controller = None
         
+        self.connections = []
+        
     def run(self):
         """Run the main loop."""
-        conn, address = self.socket.accept()
-        logging.debug(f'{address} connected')
+        conn, address = self.await_connection()
         while True:
             data = conn.recv(1024).decode()
     
             if not data:
-                conn, address = self.socket.accept()
-                logging.debug(f'{address} connected')
+                conn, address = self.await_connection()
                 continue
     
             parsed = json.loads(data)
             command = parsed.get('command')
             value = parsed.get('value')
-            logging.debug(f'Command: {command}; Value: {value}')
+            logging.debug(f'Command: {command}; Value: {value} from {address}')
     
             if command == self.START:
                 self.init_driver()
                 self.send(conn)
                 
             elif command == self.EXIT:
-                self.close_driver()
+                self.close_browser()
                 self.send(conn)
-                break
-                
+                conn.close()
+                self.connections.remove(conn)
+                conn, address = self.await_connection()
+
             elif command == self.GET:
                 url = self.current_url
                 data = dict(url=url, ok=True)
@@ -79,14 +83,22 @@ class BrowserServer:
     def init_driver(self):
         """Initialize the browser."""
         if self.driver is not None:
-            logging.warning('Init driver called, but driver was already '
-                            'initialized.')
+            logging.warning('Init driver called, but driver was already'
+                            ' initialized.')
             return
         service = Service()
         self.driver = webdriver.Firefox(service=service)
         
-    def close_driver(self):
+    def close(self):
         """Close the browser."""
+        
+        self.close_browser()
+        for conn in self.connections:
+            conn.close()
+        self.socket.shutdown(socket.SHUT_RDWR)
+        self.socket.close()
+        
+    def close_browser(self):
         if self.driver is not None:
             self.driver.quit()
             self.driver = None
@@ -106,7 +118,8 @@ class BrowserServer:
         if data is None:
             data = dict(ok=True)
         conn.send(json.dumps(data).encode())
-            
+        
+    # TODO: Play after page loads
     def go_to_url(self, url):
         """Go to a given url.
         
@@ -146,8 +159,9 @@ class BrowserServer:
         
         if action in self.controller.actions:
             self.controller.actions[action]()
-        
-  
-if __name__ == '__main__':
-    server = BrowserServer()
-    server.run()
+            
+    def await_connection(self):
+        conn, address = self.socket.accept()
+        self.connections.append(conn)
+        logging.debug(f'{address} connected')
+        return conn, address
