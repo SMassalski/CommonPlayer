@@ -1,6 +1,8 @@
 import socket
 import json
 
+from django.conf import settings
+
 
 class BrowserClient:
     """Client class for communication with a browser server."""
@@ -18,46 +20,35 @@ class BrowserClient:
     SUBTITLES = 'subtitles'
     HANDLE_COOKIE_POPUP = 'cookie'
     
-    def __init__(self, port=7777):
+    def __init__(self, port=None):
+        self.port = port or settings.BROWSER_SERVER_PORT
         self.host = socket.gethostname()
-        self.port = port
-        self.socket = socket.socket()
         
-    def connect(self):
-        """Connect to a server."""
+        self.socket = None
+        
+    def __enter__(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
+        return self
         
-    def send(self, value, receive=True):
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.socket.close()
+        self.socket = None
+        
+    def send(self, value):
         """Send data to the connected server.
         
         Parameters
         ----------
         value : dict
             Data to be sent to the server.
-        receive : bool
-            Whether to expect a response.
+        
         Returns
         -------
         dict
-            The received response. None if `receive` is False.
+            The received response.
         """
         data = json.dumps(value)
         self.socket.send(data.encode())
-        if receive:
-            return self.response()
-        return None
-        
-    def close(self):
-        """Close the server connection."""
-        self.socket.close()
-        
-    def response(self):
-        """Await for a response and return it.
-        
-        Returns
-        -------
-        dict
-            The received data.
-        """
         data = self.socket.recv(1024).decode()
         return json.loads(data)

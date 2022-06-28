@@ -18,7 +18,6 @@ class CommandSerializer(serializers.Serializer):
     COMMAND_CHOICES = [
         (BrowserClient.START, 'Start'),
         (BrowserClient.EXIT, 'End'),
-        ('con', 'Connect')
     ]
     command = serializers.ChoiceField(choices=COMMAND_CHOICES)
     

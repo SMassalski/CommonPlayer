@@ -133,3 +133,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # User model
 
 AUTH_USER_MODEL = 'main.User'
+
+# Browser server
+BROWSER_SERVER_PORT = 7777

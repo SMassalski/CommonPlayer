@@ -6,13 +6,20 @@ from .client import BrowserClient
 from .serializers import CommandSerializer, NavigateSerializer, \
     ControlSerializer
 
-
-client = BrowserClient()
-client.connect()
+# TODO: Package repeating code
 
 
-class NavigateView(APIView):
-    """Navigate to or get current url"""
+class BrowserClientView(APIView):
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.client = BrowserClient()
+
+
+class NavigateView(BrowserClientView):
+    """Navigate to or get current url
+    https://www.youtube.com/watch?v=AvtVuHMqOOM"""
+    # Added url for easy access when manually testing
     serializer_class = NavigateSerializer
 
     # noinspection PyMethodMayBeStatic
@@ -21,7 +28,8 @@ class NavigateView(APIView):
         data = {
             'command': BrowserClient.GET
         }
-        browser_response = client.send(data)
+        with self.client:
+            browser_response = self.client.send(data)
         return Response(browser_response)
 
     # noinspection PyMethodMayBeStatic
@@ -31,14 +39,15 @@ class NavigateView(APIView):
             'command': BrowserClient.GOTO,
             'value': request.data.get('url'),
         }
-        browser_response = client.send(data)
+        with self.client:
+            browser_response = self.client.send(data)
         if not browser_response.get('ok'):
             return Response(browser_response,
                             status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(browser_response)
     
     
-class LifecycleView(APIView):
+class LifecycleView(BrowserClientView):
     """Control the browser's lifecycle"""
     serializer_class = CommandSerializer
 
@@ -49,29 +58,17 @@ class LifecycleView(APIView):
         Available commands:
         - Start: start a browser
         - End: close a browser
-        - Connect: connect to a server
         """
-        command = request.data.get('command')
         
-        # Connect command
-        if command == 'con':
-            try:
-                client.connect()
-                return Response(dict(ok=True))
-            except ConnectionRefusedError:
-                return Response(dict(ok=False),
-                                status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
-        # Commands handled by the browser server
-        else:
-            browser_response = client.send(request.data)
-            if not browser_response.get('ok'):
-                return Response(browser_response,
-                                status.HTTP_500_INTERNAL_SERVER_ERROR)
-            return Response(browser_response)
+        with self.client:
+            browser_response = self.client.send(request.data)
+        if not browser_response.get('ok'):
+            return Response(browser_response,
+                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(browser_response)
+    
         
-        
-class ControlView(APIView):
+class ControlView(BrowserClientView):
     """Issue commands to the media controller"""
     
     serializer_class = ControlSerializer
@@ -80,7 +77,8 @@ class ControlView(APIView):
     def post(self, request):
         data = dict(command=BrowserClient.CONTROL)
         data['value'] = request.data.get('action')
-        browser_response = client.send(data)
+        with self.client:
+            browser_response = self.client.send(data)
         if not browser_response.get('ok'):
             return Response(browser_response,
                             status.HTTP_500_INTERNAL_SERVER_ERROR)
