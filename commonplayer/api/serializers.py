@@ -51,7 +51,7 @@ class ControlSerializer(serializers.Serializer):
         pass
 
     ACTION_CHOICES = [
-        (BrowserClient.PLAY, 'Play'),
+        (BrowserClient.PLAY_PAUSE, 'Play / Pause'),
         (BrowserClient.AUTOPLAY, 'Autoplay'),
         (BrowserClient.FULLSCREEN, 'Fullscreen'),
         (BrowserClient.SUBTITLES, 'Subtitles'),

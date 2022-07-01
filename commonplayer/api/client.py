@@ -14,7 +14,7 @@ class BrowserClient:
     CONTROL = 'control'
 
     # Media controller actions
-    PLAY = 'play'
+    PLAY_PAUSE = 'play_pause'
     AUTOPLAY = 'autoplay'
     FULLSCREEN = 'fullscreen'
     SUBTITLES = 'subtitles'

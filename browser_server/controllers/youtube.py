@@ -9,7 +9,7 @@ from .base import BaseController
 
 class YoutubeController(BaseController):
     
-    PLAY = 'play'
+    PLAY_PAUSE = 'play_pause'
     AUTOPLAY = 'autoplay'
     FULLSCREEN = 'fullscreen'
     SUBTITLES = 'subtitles'
@@ -26,7 +26,7 @@ class YoutubeController(BaseController):
         self.fullscreen_button = None
         
         self.actions = {
-            self.PLAY: self.toggle_play_pause,
+            self.PLAY_PAUSE: self.toggle_play_pause,
             self.AUTOPLAY: self.toggle_autoplay,
             self.FULLSCREEN: self.toggle_fullscreen,
             self.SUBTITLES: self.toggle_subtitles,

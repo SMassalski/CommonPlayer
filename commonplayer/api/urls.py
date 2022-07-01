@@ -1,10 +1,14 @@
 from django.urls import path
 
-from .views import NavigateView, LifecycleView, ControlView
+from .views import browser_views
 
 
 urlpatterns = [
-    path('nav/', NavigateView.as_view(), name='api-nav'),
-    path('window/', LifecycleView.as_view(), name='api-lifecycle'),
-    path('control/', ControlView.as_view(), name='api-control')
+    
+    # Browser views
+    path('nav/', browser_views.NavigateView.as_view(), name='api-nav'),
+    path('window/', browser_views.LifecycleView.as_view(),
+         name='api-lifecycle'),
+    path('control/', browser_views.ControlView.as_view(), name='api-control'),
+
 ]
