@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.utils import tag
 
-from main.models import Playlist, MediaLink
+from main.models import Playlist, MediaLink, PlaylistElement
 from .util import create_test_user
 
 
@@ -161,3 +161,79 @@ class MediaLinkTests(TestCase):
     
         self.assertEqual(self.playlist.elements.get(position=0).media_link.pk,
                          media_link.pk)
+        
+        
+class PlaylistElementSaveTests(TestCase):
+    
+    @classmethod
+    def setUpTestData(cls):
+        user = create_test_user()
+        cls.user = user
+        cls.media_link_1 = MediaLink(url='example.url', added_by=user)
+        cls.media_link_1.save()
+        cls.playlist = Playlist(name='test_playlist', added_by=user)
+        cls.playlist.save()
+        
+    def test_save_to_empty_playlist(self):
+        playlist_element = PlaylistElement(playlist=self.playlist,
+                                           media_link=self.media_link_1,
+                                           position=0)
+        playlist_element.save()
+        db_playlist_element = PlaylistElement.objects\
+            .get(pk=playlist_element.pk)
+        self.assertIsNotNone(db_playlist_element)
+    
+    def test_save_same_element_at_the_same_position(self):
+        playlist_element = PlaylistElement(playlist=self.playlist,
+                                           media_link=self.media_link_1,
+                                           position=0)
+        playlist_element.save()
+        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link.save()
+        playlist_element.media_link = media_link
+        playlist_element.save()
+        playlist_element = PlaylistElement.objects \
+            .get(pk=playlist_element.pk)
+        self.assertEqual(playlist_element.media_link.pk, media_link.pk)
+
+    def test_save_different_element_at_the_same_position(self):
+        playlist_element = PlaylistElement(playlist=self.playlist,
+                                           media_link=self.media_link_1,
+                                           position=0)
+        playlist_element.save()
+        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link.save()
+        playlist_element = PlaylistElement(playlist=self.playlist,
+                                           media_link=media_link,
+                                           position=0)
+        with self.assertWarns(UserWarning):
+            playlist_element.save()
+        self.assertIsNone(playlist_element.pk)
+            
+    def test_save_warns_not_saved(self):
+        playlist_element = PlaylistElement(playlist=self.playlist,
+                                           media_link=self.media_link_1,
+                                           position=0)
+        playlist_element.save()
+        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link.save()
+        playlist_element = PlaylistElement(playlist=self.playlist,
+                                           media_link=media_link,
+                                           position=0)
+        with self.assertWarnsRegex(UserWarning, r'not saved'):
+            playlist_element.save()
+            
+    def test_save_warns_shows_proper_usage(self):
+        playlist_element = PlaylistElement(playlist=self.playlist,
+                                           media_link=self.media_link_1,
+                                           position=0)
+        playlist_element.save()
+        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link.save()
+        playlist_element = PlaylistElement(playlist=self.playlist,
+                                           media_link=media_link,
+                                           position=0)
+        msg = r'Use Playlist.add_media_at\(\) or MediaLink.add_to_playlist\(\)'
+        with self.assertWarnsRegex(UserWarning, msg):
+            playlist_element.save()
+            

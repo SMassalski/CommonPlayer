@@ -1,3 +1,5 @@
+import warnings
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -62,10 +64,11 @@ class Playlist(models.Model):
             position = self.elements \
                            .aggregate(models.Max('position'))['position__max']
             position = (position or -1) + 1  # End or 0 if playlist is empty
-        
-        self.elements\
-            .filter(position__gte=position)\
+
+        self.elements \
+            .filter(position__gte=position) \
             .update(position=models.F('position') + 1)
+
         self.elements.create(position=position, media_link=media_link)
         
     def __str__(self):
@@ -82,10 +85,27 @@ class PlaylistElement(models.Model):
                                  related_name='elements')
     media_link = models.ForeignKey(MediaLink, on_delete=models.CASCADE)
     
-    def __str__(self):
-        return f'{self.playlist.name} #{self.position}'
-    
     class Meta:
         
-        unique_together = ('playlist', 'position')
         ordering = ('playlist', 'position')
+        
+    def __str__(self):
+        return f'{self.playlist.name} #{self.position}'
+
+    # Can't use unique_together because order_by() and update() chaining,
+    # needed for inserting elements into a playlist, does not work for all
+    # rdbms and constraints are not checked at the end of the transactions
+    def save(self, *args, **kwargs):
+        
+        exists = PlaylistElement.objects\
+            .filter(~models.Q(pk=self.pk), playlist=self.playlist,
+                    position=self.position) \
+            .exists()
+        if exists:
+            msg = f'PlaylistElement was not saved because an element at' \
+                  f' position {self.position} in {self.playlist}' \
+                  f' playlist. Use Playlist.add_media_at() or ' \
+                  f'MediaLink.add_to_playlist() instead'
+            warnings.warn(msg)
+            return
+        super().save(*args, **kwargs)
