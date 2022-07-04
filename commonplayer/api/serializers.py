@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .client import BrowserClient
+from main.models import Playlist, PlaylistElement, MediaLink
 
 
 class CommandSerializer(serializers.Serializer):
@@ -59,3 +60,36 @@ class ControlSerializer(serializers.Serializer):
     ]
     action = serializers.ChoiceField(choices=ACTION_CHOICES)
     
+
+# TODO: Two PlaylistElement serializers for different directions
+#   (From MediaLink and Playlist)
+#   + Hyperlinked relations
+
+
+class MediaLinkSerializer(serializers.ModelSerializer):
+    
+    added_by = serializers.CharField(source='added_by.username',
+                                     read_only=True)
+    
+    class Meta:
+        model = MediaLink
+        fields = ['url', 'added_by']
+
+
+class PlaylistElementSerializer(serializers.HyperlinkedModelSerializer):
+    media_link = MediaLinkSerializer(read_only=True)
+    
+    class Meta:
+        model = PlaylistElement
+        fields = ['position', 'media_link']
+
+
+class PlaylistSerializer(serializers.HyperlinkedModelSerializer):
+    elements = PlaylistElementSerializer(many=True, read_only=True)
+    added_by = serializers.CharField(source='added_by.username',
+                                     read_only=True)
+    
+    class Meta:
+        model = Playlist
+        fields = ['id', 'name', 'added_by', 'elements']
+        depth = 2

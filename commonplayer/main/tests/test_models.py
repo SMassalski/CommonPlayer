@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.test.utils import tag
 
 from main.models import Playlist, MediaLink, PlaylistElement
-from .util import create_test_user
+from tests.util import create_test_user
 
 
 class PlaylistTests(TestCase):
