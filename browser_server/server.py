@@ -3,10 +3,6 @@ import json
 import logging
 from urllib.parse import urlparse
 
-# TODO: Browser selection / detection
-from selenium.webdriver.firefox.service import Service
-from selenium import webdriver
-
 from controllers.youtube import YoutubeController
 
 
@@ -24,13 +20,16 @@ class BrowserServer:
         'youtu.be': YoutubeController
     }
     
-    def __init__(self, port=7777):
+    def __init__(self, driver_class, service_class, port=7777):
         
         host = socket.gethostname()
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((host, port))
         self.socket.listen(1)
+        
+        self.driver_class = driver_class
+        self.service_class = service_class
         
         self.driver = None
         self.controller = None
@@ -86,8 +85,8 @@ class BrowserServer:
             logging.warning('Init driver called, but driver was already'
                             ' initialized.')
             return
-        service = Service()
-        self.driver = webdriver.Firefox(service=service)
+        service = self.service_class()
+        self.driver = self.driver_class(service=service)
         
     def close(self):
         """Close the browser."""
