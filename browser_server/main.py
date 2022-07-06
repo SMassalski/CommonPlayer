@@ -14,6 +14,10 @@ def main(argv):
     
     parser = argparse.ArgumentParser()
     
+    parser.add_argument('--addon', action='append',
+                        help='Path to an addon to be installed (.xpi or .crx'
+                             ' file). Argument can be used multiple times.')
+    
     browser_flag_descriptions = 'Flags determining which browser to use.' \
                                 ' If neither flag is used the ' \
                                 'browser will be selected automatically ' \
@@ -43,6 +47,9 @@ def main(argv):
     
     driver_factory = FirefoxDriverFactory() if browser == FIREFOX \
         else ChromeDriverFactory()
+    
+    # addon installation
+    driver_factory.add_extensions(*args.addon)
     
     with closing(BrowserServer(driver_factory)) as server:
         server.run()
