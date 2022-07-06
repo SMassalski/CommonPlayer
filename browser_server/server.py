@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from controllers.youtube import YoutubeController
 
 
-# TODO: Add adblock support
+# FIXME: The server still seems to quit incorrectly
 class BrowserServer:
     
     START = 'start'  # Initiate the webdriver
@@ -20,7 +20,7 @@ class BrowserServer:
         'youtu.be': YoutubeController
     }
     
-    def __init__(self, driver_class, service_class, port=7777):
+    def __init__(self, driver_factory, port=7777):
         
         host = socket.gethostname()
 
@@ -28,8 +28,7 @@ class BrowserServer:
         self.socket.bind((host, port))
         self.socket.listen(1)
         
-        self.driver_class = driver_class
-        self.service_class = service_class
+        self.driver_factory = driver_factory
         
         self.driver = None
         self.controller = None
@@ -85,8 +84,7 @@ class BrowserServer:
             logging.warning('Init driver called, but driver was already'
                             ' initialized.')
             return
-        service = self.service_class()
-        self.driver = self.driver_class(service=service)
+        self.driver = self.driver_factory.build()
         
     def close(self):
         """Close the browser."""

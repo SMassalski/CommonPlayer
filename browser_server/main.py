@@ -3,11 +3,11 @@ from shutil import which
 import argparse
 import sys
 
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium import webdriver
-
 from server import BrowserServer
+from driver_factories import FirefoxDriverFactory, ChromeDriverFactory
+
+FIREFOX = 'F'
+CHROME = 'C'
 
 
 def main(argv):
@@ -34,28 +34,17 @@ def main(argv):
         (bool(which('chromium')) or bool(which('chromium-browser')))\
         and bool(which('chromedriver'))
     
-    if args.firefox:
-        if not firefox_available:
-            raise FileNotFoundError('Either geckodriver or firefox are '
-                                    'not in path.')
-        service_class = FirefoxService
-        driver_class = webdriver.Firefox
-    elif args.chrome:
-        if not chrome_available:
-            raise FileNotFoundError('Either chromium, chromium-browser'
-                                    'or chromedriver are not in path.')
-        service_class = ChromeService
-        driver_class = webdriver.Chrome
-    elif firefox_available:
-        service_class = FirefoxService
-        driver_class = webdriver.Firefox
+    if firefox_available and (args.firefox or not args.chrome):
+        browser = FIREFOX
     elif chrome_available:
-        service_class = ChromeService
-        driver_class = webdriver.Chrome
+        browser = CHROME
     else:
         raise FileNotFoundError('Browser or driver executables not in path')
     
-    with closing(BrowserServer(driver_class, service_class)) as server:
+    driver_factory = FirefoxDriverFactory() if browser == FIREFOX \
+        else ChromeDriverFactory()
+    
+    with closing(BrowserServer(driver_factory)) as server:
         server.run()
 
 
