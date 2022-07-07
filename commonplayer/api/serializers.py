@@ -73,7 +73,7 @@ class MediaLinkSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MediaLink
-        fields = ['url', 'added_by']
+        fields = ['source', 'added_by']
 
 
 class PlaylistElementSerializer(serializers.HyperlinkedModelSerializer):

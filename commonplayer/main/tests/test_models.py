@@ -11,9 +11,9 @@ class PlaylistTests(TestCase):
     def setUpTestData(cls):
         user = create_test_user()
         cls.user = user
-        cls.media_link_1 = MediaLink(url='example.url', added_by=user)
+        cls.media_link_1 = MediaLink(source='example.url', added_by=user)
         cls.media_link_1.save()
-        cls.media_link_2 = MediaLink(url='example2.url', added_by=user)
+        cls.media_link_2 = MediaLink(source='example2.url', added_by=user)
         cls.media_link_2.save()
         
     def setUp(self) -> None:
@@ -31,7 +31,7 @@ class PlaylistTests(TestCase):
         
     def test_add_media_at_beginning(self):
 
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         self.playlist.add_media_at(media_link, 0)
 
@@ -46,7 +46,7 @@ class PlaylistTests(TestCase):
                          self.media_link_2.pk)
         
     def test_add_media_at_the_end(self):
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         self.playlist.add_media_at(media_link, None)
 
@@ -61,7 +61,7 @@ class PlaylistTests(TestCase):
                          self.media_link_2.pk)
 
     def test_add_media_in_the_middle(self):
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         self.playlist.add_media_at(media_link, 1)
     
@@ -77,7 +77,7 @@ class PlaylistTests(TestCase):
 
     @tag('setup_empty_playlist')
     def test_add_media_to_empty(self):
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         self.playlist.add_media_at(media_link)
     
@@ -91,9 +91,9 @@ class MediaLinkTests(TestCase):
     def setUpTestData(cls):
         user = create_test_user()
         cls.user = user
-        cls.media_link_1 = MediaLink(url='example.url', added_by=user)
+        cls.media_link_1 = MediaLink(source='example.url', added_by=user)
         cls.media_link_1.save()
-        cls.media_link_2 = MediaLink(url='example2.url', added_by=user)
+        cls.media_link_2 = MediaLink(source='example2.url', added_by=user)
         cls.media_link_2.save()
         
     def setUp(self) -> None:
@@ -109,7 +109,7 @@ class MediaLinkTests(TestCase):
         self.playlist.elements.create(media_link=self.media_link_2, position=1)
 
     def test_add_media_at_beginning(self):
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         media_link.add_to_playlist(self.playlist, 0)
     
@@ -124,7 +124,7 @@ class MediaLinkTests(TestCase):
                          self.media_link_2.pk)
 
     def test_add_media_at_the_end(self):
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         media_link.add_to_playlist(self.playlist, None)
     
@@ -139,7 +139,7 @@ class MediaLinkTests(TestCase):
                          self.media_link_2.pk)
 
     def test_add_media_in_the_middle(self):
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         media_link.add_to_playlist(self.playlist, 1)
     
@@ -155,7 +155,7 @@ class MediaLinkTests(TestCase):
 
     @tag('setup_empty_playlist')
     def test_add_media_to_empty(self):
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         media_link.add_to_playlist(self.playlist)
     
@@ -169,7 +169,7 @@ class PlaylistElementSaveTests(TestCase):
     def setUpTestData(cls):
         user = create_test_user()
         cls.user = user
-        cls.media_link_1 = MediaLink(url='example.url', added_by=user)
+        cls.media_link_1 = MediaLink(source='example.url', added_by=user)
         cls.media_link_1.save()
         cls.playlist = Playlist(name='test_playlist', added_by=user)
         cls.playlist.save()
@@ -188,7 +188,7 @@ class PlaylistElementSaveTests(TestCase):
                                            media_link=self.media_link_1,
                                            position=0)
         playlist_element.save()
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         playlist_element.media_link = media_link
         playlist_element.save()
@@ -201,7 +201,7 @@ class PlaylistElementSaveTests(TestCase):
                                            media_link=self.media_link_1,
                                            position=0)
         playlist_element.save()
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         playlist_element = PlaylistElement(playlist=self.playlist,
                                            media_link=media_link,
@@ -215,7 +215,7 @@ class PlaylistElementSaveTests(TestCase):
                                            media_link=self.media_link_1,
                                            position=0)
         playlist_element.save()
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         playlist_element = PlaylistElement(playlist=self.playlist,
                                            media_link=media_link,
@@ -228,7 +228,7 @@ class PlaylistElementSaveTests(TestCase):
                                            media_link=self.media_link_1,
                                            position=0)
         playlist_element.save()
-        media_link = MediaLink(url='test.url', added_by=self.user)
+        media_link = MediaLink(source='test.url', added_by=self.user)
         media_link.save()
         playlist_element = PlaylistElement(playlist=self.playlist,
                                            media_link=media_link,

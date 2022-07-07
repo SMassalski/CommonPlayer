@@ -13,11 +13,11 @@ urlpatterns = [
     
     # Playlist views
     path('playlists/', playlist_views.PlaylistView.as_view(),
-         name='api-playlists'),
+         name='api-playlist'),
     path('playlists/<int:pk>', playlist_views.PlaylistDetailView.as_view(),
          name='api-playlist-detail'),
     path('media_links/', playlist_views.MediaLinkView.as_view(),
-         name='api-media_links'),
+         name='api-media_link'),
     path('media_links/<int:pk>', playlist_views.MediaLinkDetailView.as_view(),
-         name='api-media_links-detail'),
+         name='api-media_link-detail'),
 ]

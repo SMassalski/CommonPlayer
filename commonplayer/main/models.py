@@ -16,17 +16,17 @@ class MediaLink(models.Model):
     
     Fields:
     
-    url : str
+    source : str
         The sites url.
     added_by : User
         The user that added the MediaLink
         
     """
-    url = models.CharField(max_length=100)
+    source = models.CharField(max_length=100)
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     
     def __str__(self):
-        return self.url
+        return self.source
     
     def add_to_playlist(self, playlist, position=None):
         """Insert the MediaLink at a given position of a playlist.
