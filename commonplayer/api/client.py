@@ -20,15 +20,13 @@ class BrowserClient:
     SUBTITLES = 'subtitles'
     HANDLE_COOKIE_POPUP = 'cookie'
     
-    def __init__(self, port=None):
-        self.port = port or settings.BROWSER_SERVER_PORT
-        self.host = socket.gethostname()
-        
+    def __init__(self, address=None):
+        self.address = address or settings.BROWSER_SERVER_ADDRESS
         self.socket = None
         
     def __enter__(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
+        self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.socket.connect(self.address)
         return self
         
     def __exit__(self, exc_type, exc_val, exc_tb):

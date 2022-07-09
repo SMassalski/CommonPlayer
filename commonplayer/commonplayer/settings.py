@@ -135,4 +135,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'main.User'
 
 # Browser server
-BROWSER_SERVER_PORT = 7777
+BROWSER_SERVER_ADDRESS = '/tmp/browser.sock'

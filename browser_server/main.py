@@ -17,6 +17,9 @@ def main(argv):
     parser.add_argument('--addon', action='append',
                         help='Path to an addon to be installed (.xpi or .crx'
                              ' file). Argument can be used multiple times.')
+    parser.add_argument('--bind', default='/tmp/browser.sock',
+                        help='Path to the unix socket the server will bind'
+                             ' to.')
     
     browser_flag_descriptions = 'Flags determining which browser to use.' \
                                 ' If neither flag is used the ' \
@@ -52,7 +55,7 @@ def main(argv):
     addons = args.addon or []
     driver_factory.add_extensions(*addons)
     
-    with closing(BrowserServer(driver_factory)) as server:
+    with closing(BrowserServer(driver_factory, address=args.bind)) as server:
         server.run()
 
 

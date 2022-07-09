@@ -20,12 +20,10 @@ class BrowserServer:
         'youtu.be': YoutubeController
     }
     
-    def __init__(self, driver_factory, port=7777):
-        
-        host = socket.gethostname()
+    def __init__(self, driver_factory, address):
 
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((host, port))
+        self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.socket.bind(address)
         self.socket.listen(1)
         
         self.driver_factory = driver_factory

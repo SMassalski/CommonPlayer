@@ -12,8 +12,7 @@ sys.path.append('..')
 class ClientTests(unittest.TestCase):
     
     def setUp(self) -> None:
-        self.client = BrowserClient(9999)
-        self.host = self.client.host
+        self.client = BrowserClient(address='./test.sock')
 
     def tearDown(self) -> None:
         if self.client.socket is not None:
