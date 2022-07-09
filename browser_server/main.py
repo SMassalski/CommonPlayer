@@ -49,7 +49,8 @@ def main(argv):
         else ChromeDriverFactory()
     
     # addon installation
-    driver_factory.add_extensions(*args.addon)
+    addons = args.addon or []
+    driver_factory.add_extensions(*addons)
     
     with closing(BrowserServer(driver_factory)) as server:
         server.run()
