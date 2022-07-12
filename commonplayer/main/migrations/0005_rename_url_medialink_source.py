@@ -6,13 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0004_alter_playlistelement_unique_together'),
+        ("main", "0004_alter_playlistelement_unique_together"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='medialink',
-            old_name='url',
-            new_name='source',
+            model_name="medialink",
+            old_name="url",
+            new_name="source",
         ),
     ]

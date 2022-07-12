@@ -11,37 +11,38 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 class BaseDriverFactory(ABC):
     """Driver factory base class."""
-    
+
     @abstractmethod
     def add_extensions(self, *paths):
         """Install a browser extension.
-        
+
         Parameters
         ----------
         paths : str
             Extension file paths.
         """
         pass
-        
+
     @abstractmethod
     def build(self):
         """Create a webdriver.
-        
+
         Returns
         -------
         WebDriver
         """
         pass
-    
-        
+
+
 class FirefoxDriverFactory(BaseDriverFactory):
     """Driver factory for Firefox drivers."""
+
     def __init__(self):
         self.addons = []
-    
+
     def build(self):
         """Create a Firefox webdriver.
-        
+
         Returns
         -------
         webdriver.Firefox
@@ -51,7 +52,7 @@ class FirefoxDriverFactory(BaseDriverFactory):
         for addon in self.addons:
             driver.install_addon(addon, True)
         return driver
-    
+
     def add_extensions(self, *paths):
         """Install a Firefox extension.
 
@@ -65,9 +66,10 @@ class FirefoxDriverFactory(BaseDriverFactory):
 
 class ChromeDriverFactory(BaseDriverFactory):
     """Driver factory for Chrome drivers."""
+
     def __init__(self):
         self.options = ChromeOptions()
-        
+
     def build(self):
         """Create a Chrome webdriver.
 
@@ -77,7 +79,7 @@ class ChromeDriverFactory(BaseDriverFactory):
         """
         service = ChromeService()
         return webdriver.Chrome(service=service, options=self.options)
-    
+
     def add_extensions(self, *paths):
         """Install a Chrome extension.
 

@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0003_alter_playlistelement_options_alter_playlist_name_and_more'),
+        ("main", "0003_alter_playlistelement_options_alter_playlist_name_and_more"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='playlistelement',
+            name="playlistelement",
             unique_together=set(),
         ),
     ]
