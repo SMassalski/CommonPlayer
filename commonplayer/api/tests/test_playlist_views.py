@@ -1,4 +1,4 @@
-"""Tests of api views associated with playlist functionality"""
+"""Tests of api views associated with playlist functionality."""
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
 from rest_framework import status
@@ -8,7 +8,7 @@ from main.models import Playlist, MediaLink, PlaylistElement
 
 
 class PlaylistViewGetTests(APITestCase):
-    """Tests for PlaylistView get requests"""
+    """Tests for PlaylistView GET requests"""
 
     # docstr-coverage:inherited
     @classmethod
@@ -24,7 +24,7 @@ class PlaylistViewGetTests(APITestCase):
         )
 
     def test_get_response_fields(self):
-        """Playlist view response has correct fields."""
+        """Playlist view GET request response has correct fields."""
         response = self.make_request()
         self.assertIn("name", response.data[0])
         self.assertIn("url", response.data[0])
@@ -32,13 +32,16 @@ class PlaylistViewGetTests(APITestCase):
         self.assertIn("length", response.data[0])
 
     def test_get_response_field_order(self):
-        """Playlist view response fields have the correct order."""
+        """
+        Playlist view GET request response fields have the correct
+        order.
+        """
         response = self.make_request()
         field_order = tuple(response.data[0])
         self.assertEqual(field_order, ("url", "name", "added_by", "length"))
 
     def test_get_response_includes_all_elements(self):
-        """Playlist view lists all playlists."""
+        """Playlist view GET request response lists all playlists."""
         self.add_to_playlist(self.media_link_1, 0)
         response = self.make_request()
         self.assertEqual(response.data[0]["length"], 1)
@@ -60,7 +63,7 @@ class PlaylistViewGetTests(APITestCase):
         self.playlist.elements.create(media_link=media_link, position=position)
 
     def make_request(self):
-        """Send a get request to PlaylistView
+        """Send a GET request to PlaylistView
 
         Returns
         -------
@@ -71,7 +74,7 @@ class PlaylistViewGetTests(APITestCase):
 
 
 class PlaylistViewPostTests(APITestCase):
-    """Tests for PlaylistView post requests"""
+    """Tests for PlaylistView POST requests"""
 
     # docstr-coverage:inherited
     @classmethod
@@ -82,33 +85,33 @@ class PlaylistViewPostTests(APITestCase):
         cls.user = create_test_user(cls.username, cls.password)
 
     def test_post_authenticated_response_code(self):
-        """An authenticated post request response code is correct."""
+        """An authenticated POST request response code is correct."""
         self.client.login(username=self.username, password=self.password)
         response = self.make_request(dict(name="test_playlist"))
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_creates_playlist(self):
-        """An authenticated post request creates a playlist."""
+        """An authenticated POST request creates a playlist."""
         self.client.login(username=self.username, password=self.password)
         self.make_request(dict(name="test_playlist"))
 
         self.assertTrue(Playlist.objects.filter(name="test_playlist").exists())
 
     def test_post_unauthenticated_response_code(self):
-        """An unauthenticated post request response code is correct."""
+        """An unauthenticated POST request response code is correct."""
         response = self.make_request(dict(name="test_playlist"))
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_post_unauthenticated_doesnt_create_playlist(self):
-        """An unauthenticated post request doesn't create a playlist."""
+        """An unauthenticated POST request doesn't create a playlist."""
         self.make_request(dict(name="test_playlist"))
 
         self.assertFalse(Playlist.objects.filter(name="test_playlist").exists())
 
     def make_request(self, data=None):
-        """Send a post request to PlaylistView
+        """Send a POST request to PlaylistView
 
         Parameters
         ----------
@@ -168,21 +171,21 @@ class PlaylistDetailViewTests(APITestCase):
 
     def test_get_playlist_detail_status_code(self):
         """
-        Playlist detail view get request response status code is
+        Playlist detail view GET request response status code is
         correct.
         """
         response = self.client.get(reverse(self.view_name, args=[self.playlist.pk]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_delete_playlist_detail(self):
-        """Delete request deletes the playlist."""
+        """Playlist detail view DELETE request deletes the playlist."""
         self.client.delete(reverse(self.view_name, args=[self.playlist.pk]))
 
         self.assertFalse(Playlist.objects.filter(name="test_playlist").exists())
 
     def test_delete_playlist_detail_status_code(self):
         """
-        Playlist detail view delete request response status code is
+        Playlist detail view DELETE request response status code is
         correct.
         """
         response = self.client.delete(reverse(self.view_name, args=[self.playlist.pk]))
@@ -190,7 +193,7 @@ class PlaylistDetailViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_put_playlist_detail(self):
-        """Playlist detail view put request updates playlist."""
+        """Playlist detail view PUT request updates playlist."""
         self.client.put(
             reverse(self.view_name, args=[self.playlist.pk]), data={"name": "new_name"}
         )
@@ -200,7 +203,7 @@ class PlaylistDetailViewTests(APITestCase):
 
     def test_put_playlist_detail_status_code(self):
         """
-        Playlist detail view put request response status code is
+        Playlist detail view PUT request response status code is
         correct.
         """
         response = self.client.put(
@@ -211,7 +214,7 @@ class PlaylistDetailViewTests(APITestCase):
 
 
 class MediaLinkViewGetTests(APITestCase):
-    """Tests for MediaLinkView get requests"""
+    """Tests for MediaLinkView GET requests"""
 
     # docstr-coverage:inherited
     @classmethod
@@ -226,19 +229,19 @@ class MediaLinkViewGetTests(APITestCase):
         )
 
     def test_get_response_media_link_fields(self):
-        """MediaLink view get request response has correct fields."""
+        """MediaLink view GET request response has correct fields."""
         response = self.make_request()
         self.assertIn("url", response.data[0])
         self.assertIn("source", response.data[0])
         self.assertIn("added_by", response.data[0])
 
     def test_get_response_lists_all(self):
-        """MediaLink get request response contains all media_links."""
+        """MediaLink GET request response contains all media_links."""
         response = self.make_request()
         self.assertEqual(len(response.data), 2)
 
     def make_request(self):
-        """Send a get request to MediaLinkView.
+        """Send a GET request to MediaLinkView.
 
         Returns
         -------
@@ -249,7 +252,7 @@ class MediaLinkViewGetTests(APITestCase):
 
 
 class MediaLinkPostTests(APITestCase):
-    """Tests for MediaLinkView post requests"""
+    """Tests for MediaLinkView POST requests"""
 
     # docstr-coverage:inherited
     @classmethod
@@ -261,7 +264,7 @@ class MediaLinkPostTests(APITestCase):
 
     def test_post_authenticated_response_code(self):
         """
-        An authenticated post request to media link view returns with
+        An authenticated POST request to media link view returns with
         correct status code.
         """
         self.client.login(username=self.username, password=self.password)
@@ -271,7 +274,7 @@ class MediaLinkPostTests(APITestCase):
 
     def test_post_creates_media_link(self):
         """
-        A post request to media link view creates a new MediaLink entry.
+        A POST request to media link view creates a new MediaLink entry.
         """
         self.client.login(username=self.username, password=self.password)
         self.make_request(dict(source="test.url"))
@@ -280,7 +283,7 @@ class MediaLinkPostTests(APITestCase):
 
     def test_post_unauthenticated_response_code(self):
         """
-        An unauthenticated post request to media link view returns with
+        An unauthenticated POST request to media link view returns with
         correct status code.
         """
         response = self.make_request(dict(source="test.url"))
@@ -289,7 +292,7 @@ class MediaLinkPostTests(APITestCase):
 
     def test_post_unauthenticated_doesnt_create_media_link(self):
         """
-        An unauthenticated post request to media link view doesn't
+        An unauthenticated POST request to media link view doesn't
         create a new MediaLink entry.
         """
         self.make_request(dict(source="test.url"))
@@ -297,7 +300,7 @@ class MediaLinkPostTests(APITestCase):
         self.assertFalse(MediaLink.objects.filter(source="test.url").exists())
 
     def make_request(self, data=None):
-        """Send a post request to MediaLinkView
+        """Send a POST request to MediaLinkView
 
         Parameters
         ----------
@@ -326,7 +329,7 @@ class MediaLinkDetailViewTests(APITestCase):
 
     def test_get_media_link_detail_fields(self):
         """
-        MediaLink detail view get request response has correct fields.
+        MediaLink detail view GET request response has correct fields.
         """
         response = self.client.get(reverse(self.view_name, args=[self.media_link_1.pk]))
         self.assertIn("source", response.data)
@@ -335,7 +338,7 @@ class MediaLinkDetailViewTests(APITestCase):
 
     def test_get_media_link_playlists_field(self):
         """
-        MediaLink detail view get request response playlist listing
+        MediaLink detail view GET request response playlist listing
         has correct fields.
         """
 
@@ -349,7 +352,7 @@ class MediaLinkDetailViewTests(APITestCase):
 
     def test_get_media_link_detail_status_code(self):
         """
-        MediaLink detail view get request response status code is
+        MediaLink detail view GET request response status code is
         correct.
         """
         response = self.client.get(reverse(self.view_name, args=[self.media_link_1.pk]))
@@ -357,14 +360,14 @@ class MediaLinkDetailViewTests(APITestCase):
 
     def test_delete_media_link_detail(self):
         """
-        MediaLink detail view delete request deletes MediaLink entry."""
+        MediaLink detail view DELETE request deletes MediaLink entry."""
         self.client.delete(reverse(self.view_name, args=[self.media_link_1.pk]))
 
         self.assertFalse(MediaLink.objects.filter(pk=self.media_link_1.pk).exists())
 
     def test_delete_media_link_detail_status_code(self):
         """
-        MediaLink detail view delete request response status code is
+        MediaLink detail view DELETE request response status code is
         correct.
         """
         response = self.client.delete(
@@ -374,7 +377,7 @@ class MediaLinkDetailViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_put_media_link_detail(self):
-        """MediaLink detail view put request updates MediaLink entry."""
+        """MediaLink detail view PUT request updates MediaLink entry."""
         self.client.put(
             reverse(self.view_name, args=[self.media_link_1.pk]),
             data={"source": "new_url"},
@@ -385,7 +388,7 @@ class MediaLinkDetailViewTests(APITestCase):
 
     def test_put_media_link_detail_status_code(self):
         """
-        MediaLink detail view put request response status code is
+        MediaLink detail view PUT request response status code is
         correct.
         """
         response = self.client.put(

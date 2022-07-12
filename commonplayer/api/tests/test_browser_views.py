@@ -1,3 +1,4 @@
+"""Tests of api views associated with browser control functionality."""
 import sys
 
 import mock
@@ -27,17 +28,28 @@ HANDLE_COOKIE_POPUP = "cookie"
 
 @mock.patch("api.views.browser_views.BrowserClientView.send_to_browser_server")
 class NavViewTests(APITestCase):
+    """Navigate view tests"""
+
+    # docstr-coverage:inherited
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.url = reverse("api-nav")
 
     def test_get_url(self, mock_send):
+        """
+        GET request to NavigateView sends correct command to browser
+        server.
+        """
         mock_send.return_value = Response()
         self.client.get(self.url)
         mock_send.assert_called_with({"command": GET})
 
     def test_go_to_url(self, mock_send):
+        """
+        POST request to NavigateView sends correct command to browser
+        server.
+        """
         mock_send.return_value = Response()
         self.client.post(self.url, data=dict(url="fake_url"))
         mock_send.assert_called_with({"command": GOTO, "value": "fake_url"})
@@ -45,12 +57,18 @@ class NavViewTests(APITestCase):
 
 @mock.patch("api.views.browser_views.BrowserClientView.send_to_browser_server")
 class LifecycleViewTests(APITestCase):
+    """Lifecycle view tests"""
+
+    # docstr-coverage:inherited
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.url = reverse("api-lifecycle")
 
     def test_post_command(self, mock_send):
+        """
+        POST request to LifecycleView sends command to browser server.
+        """
         mock_send.return_value = Response()
         data = dict(command="test")
         self.client.post(self.url, data=data)
@@ -61,12 +79,19 @@ class LifecycleViewTests(APITestCase):
 
 @mock.patch("api.views.browser_views.BrowserClientView.send_to_browser_server")
 class ControlViewTests(APITestCase):
+    """Control view tests"""
+
+    # docstr-coverage:inherited
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.url = reverse("api-control")
 
     def test_post_media_action(self, mock_send):
+        """
+        POST request to ControlView sends control command with action
+        value.
+        """
         mock_send.return_value = Response()
         self.client.post(self.url, data=dict(action="test_action"))
         called_with = {"command": CONTROL, "value": "test_action"}

@@ -1,3 +1,4 @@
+"""commonplayer.main model tests"""
 from django.test import TestCase
 from django.test.utils import tag
 
@@ -6,6 +7,9 @@ from tests.util import create_test_user
 
 
 class PlaylistTests(TestCase):
+    """Playlist model tests"""
+
+    # docstr-coverage:inherited
     @classmethod
     def setUpTestData(cls):
         user = create_test_user()
@@ -15,6 +19,7 @@ class PlaylistTests(TestCase):
         cls.media_link_2 = MediaLink(source="example2.url", added_by=user)
         cls.media_link_2.save()
 
+    # docstr-coverage:inherited
     def setUp(self) -> None:
 
         # Retrieve django tags
@@ -29,7 +34,10 @@ class PlaylistTests(TestCase):
         self.playlist.elements.create(media_link=self.media_link_2, position=1)
 
     def test_add_media_at_beginning(self):
-
+        """
+        Adding media to the beginning of the playlist using
+        add_media_at().
+        """
         media_link = MediaLink(source="test.url", added_by=self.user)
         media_link.save()
         self.playlist.add_media_at(media_link, 0)
@@ -48,6 +56,9 @@ class PlaylistTests(TestCase):
         )
 
     def test_add_media_at_the_end(self):
+        """
+        Adding media to the end of the playlist using add_media_at().
+        """
         media_link = MediaLink(source="test.url", added_by=self.user)
         media_link.save()
         self.playlist.add_media_at(media_link, None)
@@ -66,6 +77,9 @@ class PlaylistTests(TestCase):
         )
 
     def test_add_media_in_the_middle(self):
+        """
+        Adding media in the middle of the playlist using add_media_at().
+        """
         media_link = MediaLink(source="test.url", added_by=self.user)
         media_link.save()
         self.playlist.add_media_at(media_link, 1)
@@ -85,6 +99,9 @@ class PlaylistTests(TestCase):
 
     @tag("setup_empty_playlist")
     def test_add_media_to_empty(self):
+        """
+        Adding media to an empty playlist using add_media_at().
+        """
         media_link = MediaLink(source="test.url", added_by=self.user)
         media_link.save()
         self.playlist.add_media_at(media_link)
@@ -95,6 +112,9 @@ class PlaylistTests(TestCase):
 
 
 class MediaLinkTests(TestCase):
+    """MediaLink model tests"""
+
+    # docstr-coverage:inherited
     @classmethod
     def setUpTestData(cls):
         user = create_test_user()
@@ -104,6 +124,7 @@ class MediaLinkTests(TestCase):
         cls.media_link_2 = MediaLink(source="example2.url", added_by=user)
         cls.media_link_2.save()
 
+    # docstr-coverage:inherited
     def setUp(self) -> None:
         # Retrieve django tags
         method = getattr(self, self._testMethodName)
@@ -117,6 +138,10 @@ class MediaLinkTests(TestCase):
         self.playlist.elements.create(media_link=self.media_link_2, position=1)
 
     def test_add_media_at_beginning(self):
+        """
+        Adding media to the beginning of the playlist using
+        add_to_playlist().
+        """
         media_link = MediaLink(source="test.url", added_by=self.user)
         media_link.save()
         media_link.add_to_playlist(self.playlist, 0)
@@ -135,6 +160,9 @@ class MediaLinkTests(TestCase):
         )
 
     def test_add_media_at_the_end(self):
+        """
+        Adding media to the end of the playlist using add_to_playlist().
+        """
         media_link = MediaLink(source="test.url", added_by=self.user)
         media_link.save()
         media_link.add_to_playlist(self.playlist, None)
@@ -153,6 +181,10 @@ class MediaLinkTests(TestCase):
         )
 
     def test_add_media_in_the_middle(self):
+        """
+        Adding media in the middle of the playlist using
+        add_to_playlist().
+        """
         media_link = MediaLink(source="test.url", added_by=self.user)
         media_link.save()
         media_link.add_to_playlist(self.playlist, 1)
@@ -172,6 +204,9 @@ class MediaLinkTests(TestCase):
 
     @tag("setup_empty_playlist")
     def test_add_media_to_empty(self):
+        """
+        Adding media to an empty playlist using add_to_playlist().
+        """
         media_link = MediaLink(source="test.url", added_by=self.user)
         media_link.save()
         media_link.add_to_playlist(self.playlist)
@@ -182,6 +217,9 @@ class MediaLinkTests(TestCase):
 
 
 class PlaylistElementSaveTests(TestCase):
+    """Tests checking if saving PlaylistElement works properly."""
+
+    # docstr-coverage:inherited
     @classmethod
     def setUpTestData(cls):
         user = create_test_user()
@@ -192,6 +230,7 @@ class PlaylistElementSaveTests(TestCase):
         cls.playlist.save()
 
     def test_save_to_empty_playlist(self):
+        """Saving a PlaylistElement with an empty playlist"""
         playlist_element = PlaylistElement(
             playlist=self.playlist, media_link=self.media_link_1, position=0
         )
@@ -200,6 +239,9 @@ class PlaylistElementSaveTests(TestCase):
         self.assertIsNotNone(db_playlist_element)
 
     def test_save_same_element_at_the_same_position(self):
+        """
+        Saving the same element at the same position in its playlist.
+        """
         playlist_element = PlaylistElement(
             playlist=self.playlist, media_link=self.media_link_1, position=0
         )
@@ -212,6 +254,10 @@ class PlaylistElementSaveTests(TestCase):
         self.assertEqual(playlist_element.media_link.pk, media_link.pk)
 
     def test_save_different_element_at_the_same_position(self):
+        """
+        Saving a PlaylistElement in a position occupied by another
+        PlaylistElement fails with a warning
+        """
         playlist_element = PlaylistElement(
             playlist=self.playlist, media_link=self.media_link_1, position=0
         )
@@ -226,6 +272,9 @@ class PlaylistElementSaveTests(TestCase):
         self.assertIsNone(playlist_element.pk)
 
     def test_save_warns_not_saved(self):
+        """
+        Save fail warning informs that the element was not saved.
+        """
         playlist_element = PlaylistElement(
             playlist=self.playlist, media_link=self.media_link_1, position=0
         )
@@ -239,6 +288,10 @@ class PlaylistElementSaveTests(TestCase):
             playlist_element.save()
 
     def test_save_warns_shows_proper_usage(self):
+        """
+        Save fail warning informs how to properly insert into a
+        playlist.
+        """
         playlist_element = PlaylistElement(
             playlist=self.playlist, media_link=self.media_link_1, position=0
         )

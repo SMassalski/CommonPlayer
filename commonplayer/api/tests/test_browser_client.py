@@ -1,3 +1,4 @@
+"""Tests associated with browser client functionality."""
 import sys
 import unittest
 
@@ -10,14 +11,19 @@ sys.path.append("..")
 
 
 class ClientTests(unittest.TestCase):
+    """Tests for BrowserClient class."""
+
+    # docstr-coverage:inherited
     def setUp(self) -> None:
         self.client = BrowserClient(address="./test.sock")
 
+    # docstr-coverage:inherited
     def tearDown(self) -> None:
         if self.client.socket is not None:
             self.client.socket.close()
 
     def test_client_send_called(self):
+        """send() method calls socket.send()"""
         data = {"msg": "test"}
         with mock.patch.object(self.client, "socket"):
             self.client.socket.recv.return_value = b'{"msg": "test"}'
@@ -25,6 +31,7 @@ class ClientTests(unittest.TestCase):
             self.client.socket.send.assert_called_with(b'{"msg": "test"}')
 
     def test_client_send_response(self):
+        """send() method waits for and parses response"""
         data = {"msg": "test"}
         with mock.patch.object(self.client, "socket"):
             self.client.socket.recv.return_value = b'{"msg": "test"}'
