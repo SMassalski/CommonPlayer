@@ -2,3 +2,4 @@ coverage==6.4.1
 docstr-coverage==2.2.0
 httpie==3.2.1
 black==22.6.0
+pre-commit==2.20.0

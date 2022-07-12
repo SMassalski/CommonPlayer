@@ -1,0 +1,4 @@
+paths:
+  - .
+badge: docstr_cov.svg
+fail_under: 50
