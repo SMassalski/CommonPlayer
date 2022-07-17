@@ -1,4 +1,7 @@
 paths:
   - .
 badge: docstr_cov.svg
-fail_under: 50
+exclude: .*/(migrations)|(apps\.py)
+fail_under: 75
+ignore_patterns:
+  .*: __str__

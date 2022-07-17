@@ -1,0 +1,12 @@
+[run]
+branch = True
+
+[report]
+skip_empty = True
+omit =
+    */tests/*
+    */migrations/*
+    commonplayer/commonplayer/*
+    */manage.py
+    */apps.py
+    */urls.py
