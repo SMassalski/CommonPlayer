@@ -93,6 +93,7 @@ class PlaylistElement(models.Model):
         MediaLink, on_delete=models.CASCADE, related_name="playlists"
     )
 
+    # docstr-coverage:inherited
     class Meta:
 
         ordering = ("playlist", "position")
@@ -103,6 +104,8 @@ class PlaylistElement(models.Model):
     # Can't use unique_together because order_by() and update() chaining,
     # needed for inserting elements into a playlist, does not work for all
     # rdbms and constraints are not checked at the end of the transactions
+
+    # docstr-coverage:inherited
     def save(self, *args, **kwargs):
 
         exists = PlaylistElement.objects.filter(
