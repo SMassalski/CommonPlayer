@@ -5,6 +5,11 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """Custom user class
+
+    Currently, no changes to regular user model are implemented
+    """
+
     pass
 
 
