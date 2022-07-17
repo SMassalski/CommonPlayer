@@ -1,3 +1,4 @@
+import os
 import socket
 import json
 import logging
@@ -8,50 +9,57 @@ from controllers.youtube import YoutubeController
 
 # FIXME: The server still seems to quit incorrectly
 class BrowserServer:
-    
-    START = 'start'  # Initiate the webdriver
-    EXIT = 'exit'  # Close the webdriver
-    GOTO = 'go_to'  # Go to a given url
-    GET = 'get_url'  # Return the current url
-    CONTROL = 'control'  # Send command to media controller
-    
+
+    START = "start"  # Initiate the webdriver
+    EXIT = "exit"  # Close the webdriver
+    GOTO = "go_to"  # Go to a given url
+    GET = "get_url"  # Return the current url
+    CONTROL = "control"  # Send command to media controller
+
     domain_controllers = {
-        'www.youtube.com': YoutubeController,
-        'youtu.be': YoutubeController
+        "www.youtube.com": YoutubeController,
+        "youtu.be": YoutubeController,
     }
-    
+
     def __init__(self, driver_factory, address):
+
+        try:
+            os.remove(address)
+        except OSError:
+            if os.path.exists(address):
+                raise
 
         self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.socket.bind(address)
         self.socket.listen(1)
-        
+
         self.driver_factory = driver_factory
-        
+
         self.driver = None
         self.controller = None
-        
+
         self.connections = []
-        
+
     def run(self):
         """Run the main loop."""
         conn, address = self.await_connection()
         while True:
             data = conn.recv(1024).decode()
-    
+
             if not data:
                 conn, address = self.await_connection()
                 continue
-    
+
             parsed = json.loads(data)
-            command = parsed.get('command')
-            value = parsed.get('value')
-            logging.debug(f'Command: {command}; Value: {value} from {address}')
-    
+            command = parsed.get("command")
+            value = parsed.get("value")
+            logging.debug(f"Command: {command}; Value: {value} from {address}")
+
+            # TODO: Command encapsulation
             if command == self.START:
                 self.init_driver()
                 self.send(conn)
-                
+
             elif command == self.EXIT:
                 self.close_browser()
                 self.send(conn)
@@ -63,13 +71,13 @@ class BrowserServer:
                 url = self.current_url
                 data = dict(url=url, ok=True)
                 if url is None:
-                    data['ok'] = False
+                    data["ok"] = False
                 self.send(conn, data)
-    
+
             elif command == self.GOTO:
                 self.go_to_url(value)
                 self.send(conn)
-                
+
             elif command == self.CONTROL:
                 self.control_player(value)
                 self.send(conn)
@@ -79,20 +87,21 @@ class BrowserServer:
     def init_driver(self):
         """Initialize the browser."""
         if self.driver is not None:
-            logging.warning('Init driver called, but driver was already'
-                            ' initialized.')
+            logging.warning(
+                "Init driver called, but driver was already" " initialized."
+            )
             return
         self.driver = self.driver_factory.build()
-        
+
     def close(self):
         """Close the browser."""
-        
+
         self.close_browser()
         for conn in self.connections:
             conn.close()
         self.socket.shutdown(socket.SHUT_RDWR)
         self.socket.close()
-        
+
     def close_browser(self):
         if self.driver is not None:
             self.driver.quit()
@@ -101,7 +110,7 @@ class BrowserServer:
     # noinspection PyMethodMayBeStatic
     def send(self, conn, data=None):
         """Send data to socket.
-        
+
         Parameters
         ----------
         conn : socket.socket
@@ -109,15 +118,15 @@ class BrowserServer:
             Data to be sent. If set to None (default) {'ok':True} is
             sent.
         """
-        
+
         if data is None:
             data = dict(ok=True)
         conn.send(json.dumps(data).encode())
-        
+
     # TODO: Play after page loads
     def go_to_url(self, url):
         """Go to a given url.
-        
+
         Parameters
         ----------
         url : str
@@ -130,11 +139,11 @@ class BrowserServer:
             self.controller = None
         elif not isinstance(self.controller, controller_class):
             self.controller = controller_class(self.driver)
-           
+
     @property
     def current_url(self):
         """The url the browser is currently on.
-        
+
         Returns
         -------
         str
@@ -142,21 +151,21 @@ class BrowserServer:
         if self.driver is not None:
             return self.driver.current_url
         return None
-    
+
     def control_player(self, action):
         """Perform a media controller action.
-        
+
         Parameters
         ----------
         action : str
 
         """
-        
+        # TODO: This should be a controller method
         if action in self.controller.actions:
             self.controller.actions[action]()
-            
+
     def await_connection(self):
         conn, address = self.socket.accept()
         self.connections.append(conn)
-        logging.debug(f'{address} connected')
+        logging.debug(f"{address} connected")
         return conn, address
